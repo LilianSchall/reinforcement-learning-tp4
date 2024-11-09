@@ -1,3 +1,4 @@
 ale-py
 numpy
 matplotlib
+gymnasium
