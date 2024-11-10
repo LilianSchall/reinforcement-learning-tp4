@@ -18,6 +18,7 @@ class PongEnvironment:
     def __init__(self) -> None:
         if not PongEnvironment.loaded_gym:
             gym.register_envs(ale_py)
+            PongEnvironment.loaded_gym = True
 
         self.env = gym.make("ALE/Pong-v5", obs_type="grayscale")
         self.action_space = self.env.action_space.n # type: ignore
