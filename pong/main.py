@@ -7,7 +7,7 @@ import torch
 def main(nb_epochs: int, max_nb_steps: int, max_memory: int):
     environment = PongEnvironment()
     q_function  = DQN(environment.get_nb_actions())
-    agent       = QLearningAgent(0.99, q_function)
+    agent       = QLearningAgent(0.99, 0.01, q_function)
     memory: List[Tuple[State, Action, Reward, State]] = []
 
     current_state: State = environment.reset()
