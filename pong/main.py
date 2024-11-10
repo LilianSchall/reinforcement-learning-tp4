@@ -10,7 +10,7 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int):
     agent       = QLearningAgent(0.99, q_function)
     memory: List[Tuple[State, Action, Reward, State]] = []
 
-    current_state: torch.Tensor = environment.reset()
+    current_state: State = environment.reset()
 
     for epoch in range(nb_epochs):
         for step in range(max_nb_steps):
@@ -33,3 +33,4 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int):
 
 if __name__ == "__main__":
     main(100, 1000, 500)
+
