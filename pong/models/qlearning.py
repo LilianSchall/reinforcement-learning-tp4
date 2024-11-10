@@ -1,21 +1,30 @@
 import torch
 from typing import List, Tuple
 
+from pong.models import DQN
+from pong.env import Reward, State, Action
+
 class QLearningAgent:
+
+    gamma: float
+    q_function: DQN
+
     def __init__(
         self, 
         gamma: float,
+        q_function: DQN
     ) -> None:
-        pass
+        self.gamma = gamma
+        self.q_function = q_function
 
     def forward(
         self,
-        state: torch.Tensor
-    ) -> int:
+        state: State
+    ) -> Action:
         return 0
 
     def backward(
         self,
-        batch: List[Tuple[torch.Tensor, int, float, torch.Tensor]]
+        batch: List[Tuple[State, Action, Reward, State]]
     ) -> None:
         pass
