@@ -20,7 +20,7 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int):
 
             if len(memory) >= max_memory:
                 memory.pop()
-                memory.append((current_state, action, reward, next_state))
+            memory.append((current_state, action, reward, next_state))
 
             # For the moment, we give the entire memory
             # We will think about how building the mini batch later.

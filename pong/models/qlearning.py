@@ -49,7 +49,7 @@ class QLearningAgent:
         self,
         state: State
     ) -> Reward:
-        return int(torch.max(self.q_function(state)))
+        return torch.max(self.q_function(state))
 
     def __select_action(
         self,
