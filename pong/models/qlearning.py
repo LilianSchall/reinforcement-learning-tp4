@@ -23,7 +23,7 @@ class QLearningAgent:
         self.gamma = gamma
         self.epsilon = epsilon
         self.q_function = q_function
-        self.optimizer = torch.optim.Adam(self.q_function.parameters(), lr=learning_rate)
+        self.optimizer = torch.optim.RMSprop(self.q_function.parameters(), lr=learning_rate)
         self.loss_function = torch.nn.MSELoss()
         self.loss: torch.Tensor | None = None
         self.nb_steps = 0
@@ -51,7 +51,7 @@ class QLearningAgent:
         batch: List[Tuple[State, Action, Reward, State]]
     ) -> None:
         if self.total_nb_steps % 1000 == 0 and self.total_nb_steps != 0:
-            self.epsilon = max(0, self.epsilon - self.decreasing_rate)
+            self.epsilon = max(0.1, self.epsilon - self.decreasing_rate)
             print(f"Decreasing epsilon to: {self.epsilon}")
 
         self.optimizer.zero_grad()

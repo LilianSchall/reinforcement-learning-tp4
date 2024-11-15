@@ -10,7 +10,7 @@ import random
 def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int):
     environment = PongEnvironment(with_video=True)
     q_function  = DQN(environment.get_nb_actions())
-    agent       = QLearningAgent(q_function, 0.99, 1, 0.05)
+    agent       = QLearningAgent(q_function, 0.99, 1.0, 0.01, 0.05)
     memory: List[Tuple[State, Action, Reward, State]] = []
 
     for epoch in range(nb_epochs):
@@ -28,9 +28,6 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int):
                 memory.pop()
             memory.append((current_state, action, reward, next_state))
 
-            # For the moment, we give the entire memory
-            # We will think about how building the mini batch later.
-            # Maybe using a DataLoader?
             agent.backward(random.choices(memory, k=min(batch_size, len(memory))))
             if done:
                 break
@@ -48,5 +45,5 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int):
 
 
 if __name__ == "__main__":
-    main(20, 1000, 500, 64)
+    main(20, 1000, 100, 32)
 
