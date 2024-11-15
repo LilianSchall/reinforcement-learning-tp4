@@ -106,8 +106,12 @@ class QLearningAgent:
         ys = []
         zs = []
         for transition in batch:
-            ys.append(self.__compute_y(transition[3], transition[2]))
-            zs.append(self.__select_reward(transition[0]))
+            state, next_state = transition[0], transition[3]
+            if self.use_cuda:
+                next_state = next_state.cuda()
+                state = state.cuda()
+            ys.append(self.__compute_y(next_state, transition[2]))
+            zs.append(self.__select_reward(state))
 
         Y = torch.tensor(ys, requires_grad=True)
         Z = torch.tensor(zs, requires_grad=True)
