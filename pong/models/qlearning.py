@@ -19,16 +19,22 @@ class QLearningAgent:
         epsilon:       float,
         learning_rate: float=0.01,
         decreasing_rate: float=0.1,
+        use_cuda: bool=False
     ) -> None:
         self.gamma = gamma
         self.epsilon = epsilon
         self.q_function = q_function
+        self.use_cuda = use_cuda
         self.optimizer = torch.optim.Adam(self.q_function.parameters(), lr=learning_rate)
         self.loss_function = torch.nn.MSELoss()
         self.loss: torch.Tensor | None = None
         self.nb_steps = 0
         self.total_nb_steps = 0
         self.decreasing_rate = decreasing_rate
+        if use_cuda:
+            q_function = q_function.cuda()
+
+
 
     def zero_loss(self) -> torch.Tensor | None:
         if self.loss is None:
@@ -44,6 +50,10 @@ class QLearningAgent:
     ) -> Action:
         if self.epsilon > torch.rand(1):
             return int(torch.randint(0, 6, (1,)))
+        
+        if self.use_cuda:
+            state = state.cuda()
+
         return self.__select_action(state)
 
     def backward(
@@ -101,4 +111,9 @@ class QLearningAgent:
 
         Y = torch.tensor(ys, requires_grad=True)
         Z = torch.tensor(zs, requires_grad=True)
+
+        if self.use_cuda:
+            Y = Y.cuda()
+            Z = Z.cuda()
+
         return Y, Z
