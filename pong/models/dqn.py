@@ -10,7 +10,7 @@ class DQN(nn.Module):
         nb_actions: int
     ) -> None:
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(1, 16, 8, stride=4)
+        self.conv1 = nn.Conv2d(4, 16, 8, stride=4)
         self.conv2 = nn.Conv2d(16, 32, 4, stride=2)
         self.fc1 = nn.Linear(32 * 9 * 9, 256)
         self.fc2 = nn.Linear(256, nb_actions)

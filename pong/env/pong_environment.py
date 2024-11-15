@@ -1,5 +1,6 @@
 from typing import SupportsFloat, Tuple
 import gymnasium as gym
+from gymnasium.wrappers import RecordVideo
 import numpy as np
 import ale_py
 import torch
@@ -14,13 +15,23 @@ class PongEnvironment:
     loaded_gym = False
     action_space: int
     frame_size: int
+    frame_buffer: list[State]
 
-    def __init__(self) -> None:
+    def __init__(self, with_video=False) -> None:
         if not PongEnvironment.loaded_gym:
             gym.register_envs(ale_py)
             PongEnvironment.loaded_gym = True
 
-        self.env = gym.make("ALE/Pong-v5", obs_type="grayscale")
+        self.env = gym.make("ALE/Pong-v5", obs_type="grayscale", render_mode="rgb_array")
+        
+        if with_video:
+            self.env = RecordVideo(
+                self.env,
+                video_folder="videos",
+                name_prefix="training",
+                episode_trigger=lambda x: True
+            )
+
         self.action_space = self.env.action_space.n # type: ignore
         self.frame_size = 88
 
@@ -29,23 +40,39 @@ class PongEnvironment:
             transforms.Resize((100, 84)),
             transforms.CenterCrop(self.frame_size)
         ])
+        self.frame_buffer = []
 
     def reset(self) -> State:
         state, _ = self.env.reset()
-        return self.__process_gym_state(state)
+        frame: State =  self.__process_gym_state(state)
+        self.frame_buffer = [frame.clone()] * 4
+        returned_state: State = self.__produce_concatenated_state()
+        return returned_state
+
+    def close(self):
+        self.env.close()
 
     def get_nb_actions(self) -> int:
         return self.action_space
 
     def step(self, action: Action) -> Tuple[State, Reward, bool]:
         next_state, reward, done, _, _ = self.env.step(action)
-        return (
-            self.__process_gym_state(next_state),
+        t = (
+            self.__produce_concatenated_state(self.__process_gym_state(next_state)),
             reward,
             done
         )
+        return t
 
     def __process_gym_state(self, state: np.ndarray) -> State:
         state = state[...,None]
         return self.frame_preprocessing(state) # type: ignore
-        
+
+    def __produce_concatenated_state(self, new_state=None) -> State:
+        if new_state is not None:
+            self.frame_buffer.pop()
+            self.frame_buffer.append(new_state)
+
+        returned_state: State = torch.vstack(self.frame_buffer)
+        returned_state = returned_state[None, ...]
+        return returned_state
