@@ -23,7 +23,7 @@ class QLearningAgent:
         self.gamma = gamma
         self.epsilon = epsilon
         self.q_function = q_function
-        self.optimizer = torch.optim.RMSprop(self.q_function.parameters(), lr=learning_rate)
+        self.optimizer = torch.optim.Adam(self.q_function.parameters(), lr=learning_rate)
         self.loss_function = torch.nn.MSELoss()
         self.loss: torch.Tensor | None = None
         self.nb_steps = 0

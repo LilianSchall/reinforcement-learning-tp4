@@ -25,7 +25,7 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int):
 
             rewards.append(reward)
             if len(memory) >= max_memory:
-                memory.pop()
+                memory.pop(0)
             memory.append((current_state, action, reward, next_state))
 
             agent.backward(random.choices(memory, k=min(batch_size, len(memory))))
@@ -45,5 +45,5 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int):
 
 
 if __name__ == "__main__":
-    main(20, 1000, 100, 32)
+    main(20, 1000, 500, 64)
 

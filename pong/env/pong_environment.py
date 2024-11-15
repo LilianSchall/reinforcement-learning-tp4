@@ -70,7 +70,7 @@ class PongEnvironment:
 
     def __produce_concatenated_state(self, new_state=None) -> State:
         if new_state is not None:
-            self.frame_buffer.pop()
+            self.frame_buffer.pop(0)
             self.frame_buffer.append(new_state)
 
         returned_state: State = torch.vstack(self.frame_buffer)
