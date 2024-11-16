@@ -22,7 +22,7 @@ class PongEnvironment:
             gym.register_envs(ale_py)
             PongEnvironment.loaded_gym = True
 
-        self.env = gym.make("PongNoFrameskip-v4", obs_type="grayscale", render_mode="rgb_array")
+        self.env = gym.make("ALE/Pong-v5", obs_type="grayscale", render_mode="rgb_array")
         
         if with_video:
             self.env = RecordVideo(
