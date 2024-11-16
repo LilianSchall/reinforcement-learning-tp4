@@ -83,7 +83,8 @@ class QLearningAgent:
         self,
         state: State
     ) -> Reward:
-        return torch.max(self.q_function(state))
+        out, _ = torch.max(self.q_function(state), -1, keepdim=True)
+        return out.transpose(0, -1)
 
     def __select_action(
         self,
@@ -103,21 +104,19 @@ class QLearningAgent:
         self,
         batch: List[Tuple[State, Action, Reward, State]]
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        ys = []
-        zs = []
-        for transition in batch:
-            state, next_state = transition[0], transition[3]
-            if self.use_cuda:
-                next_state = next_state.cuda()
-                state = state.cuda()
-            ys.append(self.__compute_y(next_state, transition[2]))
-            zs.append(self.__select_reward(state))
+        
+        states, actions, rewards, next_states = zip(*batch)
 
-        Y = torch.tensor(ys, requires_grad=True)
-        Z = torch.tensor(zs, requires_grad=True)
+        t_states = torch.vstack(states)
+        t_next_states = torch.vstack(next_states)
+        t_rewards = torch.tensor(rewards)
 
         if self.use_cuda:
-            Y = Y.cuda()
-            Z = Z.cuda()
+            t_states = t_states.cuda()
+            t_next_states = t_next_states.cuda()
+            t_rewards = t_rewards.cuda()
+
+        Z = self.__select_reward(t_states)
+        Y = t_rewards + self.gamma * self.__select_reward(t_next_states) # type: ignore
 
         return Y, Z

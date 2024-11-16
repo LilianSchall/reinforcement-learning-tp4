@@ -50,5 +50,5 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
 
 
 if __name__ == "__main__":
-    main(20, 1000, 500, 64, False)
+    main(20, 10000, 500, 64, False)
 
