@@ -39,7 +39,7 @@ class PongEnvironment:
             transforms.ToTensor(),
             transforms.Resize((84, 110)),
             transforms.CenterCrop(self.frame_size),
-            lambda x: x>0,
+            lambda x: x>0.5,
             lambda x: x.float(),
         ])
         self.frame_buffer = []
