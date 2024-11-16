@@ -37,7 +37,7 @@ class PongEnvironment:
 
         self.frame_preprocessing = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Resize((110, 84)),
+            transforms.Resize((84, 110)),
             transforms.CenterCrop(self.frame_size)
         ])
         self.frame_buffer = []
@@ -65,7 +65,7 @@ class PongEnvironment:
         return t
 
     def __process_gym_state(self, state: np.ndarray) -> State:
-        state = state[...,None]
+        state = state.T[...,None]
         return self.frame_preprocessing(state) # type: ignore
 
     def __produce_concatenated_state(self, new_state=None) -> State:
