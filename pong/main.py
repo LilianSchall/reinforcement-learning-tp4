@@ -11,7 +11,7 @@ import gc
 def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, use_cuda: bool):
     environment = PongEnvironment(with_video=True)
     q_function  = DQN(environment.get_nb_actions())
-    agent       = QLearningAgent(q_function, 0.99, 1.0, 0.01, 0.05, use_cuda)
+    agent       = QLearningAgent(q_function, 0.99, 1.0, 0.001, 0.001, use_cuda)
     memory: List[Tuple[State, Action, Reward, State]] = []
 
     for epoch in range(nb_epochs):
@@ -50,5 +50,5 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
 
 
 if __name__ == "__main__":
-    main(20, 10000, 500, 64, False)
+    main(100, 10000, 500, 64, False)
 

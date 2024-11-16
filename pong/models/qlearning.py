@@ -17,7 +17,7 @@ class QLearningAgent:
         q_function:    DQN,
         gamma:         float,
         epsilon:       float,
-        learning_rate: float=0.01,
+        learning_rate: float=0.001,
         decreasing_rate: float=0.1,
         use_cuda: bool=False
     ) -> None:
@@ -91,14 +91,6 @@ class QLearningAgent:
         state: State
     ) -> Action:
         return int(torch.argmax(self.q_function(state)))
-
-    def __compute_y(
-        self,
-        next_state: State,
-        reward:     Reward,
-    ) -> float:
-        ## TODO: needs to include if next_state is terminal
-        return reward + self.gamma * self.__select_reward(next_state) # type: ignore
 
     def __preprocess_batch(
         self,
