@@ -5,6 +5,7 @@ from pong.env import PongEnvironment, State, Action, Reward
 from tqdm import tqdm
 
 import torch
+import numpy as np
 import random
 import gc
 
@@ -13,6 +14,8 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
     q_function  = DQN(environment.get_nb_actions())
     agent       = QLearningAgent(q_function, 0.99, 1.0, 0.0001, 0.001, use_cuda)
     memory: List[Tuple[State, Action, Reward, State]] = []
+
+    scores = []
 
     for epoch in range(nb_epochs):
         gc.collect()
@@ -24,6 +27,7 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
         rewards = []
         agent.zero_loss()
         action = 0
+        score = 0
         for step in tqdm(range(max_nb_steps)):
             action = agent.forward(current_state)
             next_state, reward, done = environment.step(action)
@@ -37,14 +41,13 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
             if done:
                 break
             current_state = next_state
+            score += reward # type: ignore
 
+        scores.append(score)
         loss = agent.zero_loss()
-        nb_steps_needed = len(rewards)
-        mean_reward = sum(rewards) / nb_steps_needed 
-        print(f"Nb steps needed for epoch: {nb_steps_needed}")
-        print(f"Average reward: {mean_reward}")
-        print(f"min reward: {min(rewards)}")
-        print(f"max reward: {max(rewards)}")
+
+        print(f"Average score: {np.mean(scores[-100:])}")
+        print(f"last score: {score}")
         print(f"Average loss: {loss}")
     environment.close()
 
