@@ -38,7 +38,9 @@ class PongEnvironment:
         self.frame_preprocessing = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize((84, 110)),
-            transforms.CenterCrop(self.frame_size)
+            transforms.CenterCrop(self.frame_size),
+            lambda x: x>0,
+            lambda x: x.float(),
         ])
         self.frame_buffer = []
 

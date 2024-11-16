@@ -53,5 +53,5 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
 
 
 if __name__ == "__main__":
-    main(3000, 10000, 1000, 64, False)
+    main(3000, 10000, 10000, 64, torch.cuda.is_available())
 
