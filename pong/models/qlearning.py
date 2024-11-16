@@ -39,7 +39,7 @@ class QLearningAgent:
     def zero_loss(self) -> torch.Tensor | None:
         if self.loss is None:
             return None
-        avg_loss = self.loss / self.nb_steps
+        avg_loss = self.loss.sum() / self.nb_steps
         self.loss = None
         self.nb_steps = 0
         return avg_loss
