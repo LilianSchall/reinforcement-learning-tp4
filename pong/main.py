@@ -10,7 +10,7 @@ import random
 import gc
 
 def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, use_cuda: bool):
-    environment = PongEnvironment(with_video=True)
+    environment = PongEnvironment(with_video=False)
     q_function  = DQN(environment.get_nb_actions())
     agent       = QLearningAgent(q_function, 0.99, 1.0, 0.0001, 0.001, use_cuda)
     memory: List[Tuple[State, Action, Reward, State]] = []
@@ -55,5 +55,5 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
 
 
 if __name__ == "__main__":
-    main(3000, 10000, 10000, 64, torch.cuda.is_available())
+    main(3000, 10000, 100000, 64, torch.cuda.is_available())
 

@@ -25,7 +25,7 @@ class QLearningAgent:
         self.epsilon = epsilon
         self.q_function = q_function
         self.use_cuda = use_cuda
-        self.loss_function = torch.nn.MSELoss()
+        self.loss_function = torch.nn.MSELoss(reduction="sum")
         self.loss: torch.Tensor | None = None
         self.nb_steps = 0
         self.total_nb_steps = 0
@@ -35,8 +35,6 @@ class QLearningAgent:
             q_function = q_function.cuda()
 
         self.optimizer = torch.optim.Adam(self.q_function.parameters(), lr=learning_rate)
-
-
 
     def zero_loss(self) -> torch.Tensor | None:
         if self.loss is None:
