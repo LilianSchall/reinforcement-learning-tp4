@@ -64,7 +64,6 @@ class QLearningAgent:
     ) -> None:
         if self.total_nb_steps % 1000 == 0 and self.total_nb_steps != 0:
             self.epsilon = max(0.1, self.epsilon - self.decreasing_rate)
-            print(f"Decreasing epsilon to: {self.epsilon}")
 
         self.optimizer.zero_grad()
         

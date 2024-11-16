@@ -49,6 +49,7 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
         print(f"Average score: {np.mean(scores[-100:])}")
         print(f"last score: {score}")
         print(f"Average loss: {loss}")
+        print(f"Current epsilon: {agent.epsilon}")
     environment.close()
 
 
