@@ -13,6 +13,7 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
     q_function  = DQN(environment.get_nb_actions())
     agent       = QLearningAgent(q_function, 0.99, 1.0, 0.001, 0.001, use_cuda)
     memory: List[Tuple[State, Action, Reward, State]] = []
+    k = 4
 
     for epoch in range(nb_epochs):
         gc.collect()
@@ -23,9 +24,10 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
         print(f"Epoch {epoch}")
         rewards = []
         agent.zero_loss()
-
+        action = 0
         for step in tqdm(range(max_nb_steps)):
-            action = agent.forward(current_state)
+            if step % k == 0:
+                action = agent.forward(current_state)
             next_state, reward, done = environment.step(action)
 
             rewards.append(reward)
@@ -50,5 +52,5 @@ def main(nb_epochs: int, max_nb_steps: int, max_memory: int, batch_size: int, us
 
 
 if __name__ == "__main__":
-    main(100, 10000, 500, 64, False)
+    main(3000, 10000, 1000, 64, False)
 

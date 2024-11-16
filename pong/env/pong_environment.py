@@ -33,11 +33,11 @@ class PongEnvironment:
             )
 
         self.action_space = self.env.action_space.n # type: ignore
-        self.frame_size = 88
+        self.frame_size = 84
 
         self.frame_preprocessing = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Resize((100, 84)),
+            transforms.Resize((110, 84)),
             transforms.CenterCrop(self.frame_size)
         ])
         self.frame_buffer = []
