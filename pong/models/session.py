@@ -14,6 +14,11 @@ import os
 Memory = List[Tuple[State, Action, Reward, State]]
 
 class Session:
+    """
+    Manages the interaction between the agent and
+    the environment for training or evaluation.
+    """
+
     environment: PongEnvironment
     agent: QLearningAgent
 
@@ -27,6 +32,19 @@ class Session:
         load_checkpoint: str | None=None,
         checkpoint_frequency: int | None=None,
     ):
+        """
+        Initializes the session with specified parameters and loads the agent and environment.
+
+        Args:
+            nb_epochs (int): Number of epochs to run.
+            max_nb_steps (int): Maximum steps per epoch.
+            memory_size (int): Maximum size of the memory buffer.
+            batch_size (int): Number of experiences sampled per training step.
+            training (bool): Indicates if the session is for training or evaluation.
+            load_checkpoint (str | None, optional): Path to a pre-trained model checkpoint.
+            checkpoint_frequency (int | None, optional): Frequency of saving model checkpoints.
+        """
+
         self.nb_epochs = nb_epochs
         self.max_nb_steps = max_nb_steps
 
@@ -63,6 +81,12 @@ class Session:
         
 
     def run(self):
+        """
+        Executes the session, iterating through epochs and updating the agent
+        based on the environment's feedback.
+        During training, updates the agent's policy using the memory buffer.
+        """
+
         scores: List[Reward] = []
         memory: Memory = []
         
@@ -121,6 +145,17 @@ class Session:
         reward: Reward,
         next_state: State
     ):
+        """
+        Updates the agent's memory and trains the policy using sampled experiences.
+
+        Args:
+            memory (Memory): The memory buffer storing experiences.
+            current_state (State): Current state of the environment.
+            action (Action): Action taken by the agent.
+            reward (Reward): Reward received after the action.
+            next_state (State): State of the environment after the action.
+        """
+
         if len(memory) >= self.memory_size:
             memory.pop(0)
         memory.append((current_state, action, reward, next_state))
@@ -133,4 +168,8 @@ class Session:
         )
 
     def close(self):
+        """
+        Cleans up resources and closes the environment after the session.
+        """
+
         self.environment.close()

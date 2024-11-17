@@ -5,10 +5,19 @@ import torch.nn.functional as F
 from pong.env import State
 
 class DQN(nn.Module):
+    """
+    Deep Q-Network (DQN) implementation using convolutional and fully connected layers.
+    """
     def __init__(
         self,
         nb_actions: int
     ) -> None:
+        """
+        Initialize the DQN model with convolutional and fully connected layers.
+
+        Args:
+            nb_actions (int): Number of possible actions the agent can take.
+        """
         super(DQN, self).__init__()
         self.conv1 = nn.Conv2d(4, 32, 8, stride=4)
         self.conv2 = nn.Conv2d(32, 64, 4, stride=2)
@@ -20,6 +29,15 @@ class DQN(nn.Module):
         self,
         x: State
     ) -> torch.Tensor:
+        """
+        Perform a forward pass through the network.
+
+        Args:
+            x (State): Input state tensor, typically a stack of consecutive frames.
+
+        Returns:
+            torch.Tensor: Q-values for each possible action.
+        """
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))

@@ -5,6 +5,9 @@ from pong.models import DQN
 from pong.env import Reward, State, Action
 
 class QLearningAgent:
+    """
+    Implements a Q-learning agent using a deep Q-network (DQN).
+    """
 
     gamma:      float
     epsilon:    float
@@ -22,6 +25,19 @@ class QLearningAgent:
         learning_rate: float=0.001,
         use_cuda: bool=False
     ) -> None:
+        """
+        Initialize the Q-learning agent.
+
+        Args:
+            q_function (DQN): The deep Q-network model.
+            gamma (float): Discount factor for future rewards.
+            epsilon (float): Exploration rate.
+            epsilon_decrease (float): Rate at which epsilon decreases.
+            min_epsilon (float): Minimum exploration rate.
+            learning_rate (float): Learning rate for the optimizer.
+            use_cuda (bool): Whether to use CUDA for computations.
+        """
+
         self.gamma = gamma
         self.q_function = q_function
 
@@ -41,6 +57,14 @@ class QLearningAgent:
         self.optimizer = torch.optim.Adam(self.q_function.parameters(), lr=learning_rate)
 
     def zero_loss(self) -> torch.Tensor | None:
+        """
+        Compute and return the average loss for the current step batch.
+        Resets loss and step counters.
+
+        Returns:
+            torch.Tensor | None: The average loss, or None if no loss exists.
+        """
+
         if self.loss is None:
             return None
         avg_loss = self.loss.sum() / self.nb_steps
@@ -52,6 +76,16 @@ class QLearningAgent:
         self,
         state: State
     ) -> Action:
+        """
+        Select an action based on the current policy (epsilon-greedy).
+
+        Args:
+            state (State): The current environment state.
+
+        Returns:
+            Action: The selected action.
+        """
+
         if self.epsilon > torch.rand(1):
             return int(torch.randint(0, 6, (1,)))
         
@@ -64,6 +98,14 @@ class QLearningAgent:
         self,
         batch: List[Tuple[State, Action, Reward, State]]
     ) -> None:
+        """
+        Perform a training step on a batch of transitions.
+
+        Args:
+            batch (List[Tuple[State, Action, Reward, State]]): 
+                A batch of transitions (state, action, reward, next_state).
+        """
+
         if self.total_nb_steps % 1000 == 0 and self.total_nb_steps != 0:
             self.epsilon = max(self.min_epsilon, self.epsilon - self.epsilon_decrease)
 
@@ -86,6 +128,16 @@ class QLearningAgent:
         self,
         state: State
     ) -> Reward:
+        """
+        Compute the maximum predicted reward for a given state.
+
+        Args:
+            state (State): The input state.
+
+        Returns:
+            Reward: The maximum predicted reward.
+        """
+
         out, _ = torch.max(self.q_function(state), -1, keepdim=True)
         return out.transpose(0, -1)
 
@@ -93,12 +145,33 @@ class QLearningAgent:
         self,
         state: State
     ) -> Action:
+        """
+        Select the optimal action for a given state based on the Q-function.
+
+        Args:
+            state (State): The input state.
+
+        Returns:
+            Action: The optimal action.
+        """
+
         return int(torch.argmax(self.q_function(state)))
 
     def __preprocess_batch(
         self,
         batch: List[Tuple[State, Action, Reward, State]]
     ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Preprocess a batch of transitions for training.
+
+        Args:
+            batch (List[Tuple[State, Action, Reward, State]]): 
+                A batch of transitions (state, action, reward, next_state).
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]: The target values (Y) and 
+            predicted values (Z) for the batch.
+        """
         
         states, actions, rewards, next_states = zip(*batch)
 
