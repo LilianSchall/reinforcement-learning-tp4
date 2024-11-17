@@ -17,19 +17,23 @@ class QLearningAgent:
         q_function:    DQN,
         gamma:         float,
         epsilon:       float,
+        epsilon_decrease: float=0.1,
+        min_epsilon: float=0.1,
         learning_rate: float=0.001,
-        decreasing_rate: float=0.1,
         use_cuda: bool=False
     ) -> None:
         self.gamma = gamma
-        self.epsilon = epsilon
         self.q_function = q_function
+
+        self.epsilon = epsilon
+        self.min_epsilon = min_epsilon
+        self.epsilon_decrease = epsilon_decrease
+
         self.use_cuda = use_cuda
         self.loss_function = torch.nn.MSELoss(reduction="sum")
         self.loss: torch.Tensor | None = None
         self.nb_steps = 0
         self.total_nb_steps = 0
-        self.decreasing_rate = decreasing_rate
 
         if use_cuda:
             q_function = q_function.cuda()
@@ -61,7 +65,7 @@ class QLearningAgent:
         batch: List[Tuple[State, Action, Reward, State]]
     ) -> None:
         if self.total_nb_steps % 1000 == 0 and self.total_nb_steps != 0:
-            self.epsilon = max(0.1, self.epsilon - self.decreasing_rate)
+            self.epsilon = max(self.min_epsilon, self.epsilon - self.epsilon_decrease)
 
         self.optimizer.zero_grad()
         
@@ -110,4 +114,4 @@ class QLearningAgent:
         Z = self.__select_reward(t_states)
         Y = t_rewards + self.gamma * self.__select_reward(t_next_states) # type: ignore
 
-        return Y, Z
+        return Y, Z # type: ignore
