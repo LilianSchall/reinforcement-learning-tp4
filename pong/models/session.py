@@ -69,7 +69,7 @@ class Session:
             epsilon=1.0 if training else 0.1,
             epsilon_decrease=0.001 if training else 0,
             min_epsilon=0.1,
-            learning_rate=0.0001,
+            learning_rate=0.001,
             use_cuda=self.use_cuda
         )
 
