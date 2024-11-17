@@ -11,11 +11,11 @@ import random
 import gc
 import os
 
+Memory = List[Tuple[State, Action, Reward, State]]
+
 class Session:
-    
     environment: PongEnvironment
     agent: QLearningAgent
-    memory: List[Tuple[State, Action, Reward, State]]
 
     def __init__(
         self,
@@ -31,7 +31,6 @@ class Session:
         self.max_nb_steps = max_nb_steps
 
         self.memory_size = memory_size
-        self.memory = []
 
         self.batch_size = batch_size
         self.training = training
@@ -47,13 +46,13 @@ class Session:
             print("Loaded model from: " + load_checkpoint)
 
         self.agent = QLearningAgent(
-            q_function,
-            0.99,
-            1.0,
-            0.001,
-            0.1,
-            0.0001,
-            self.use_cuda
+            q_function=q_function,
+            gamma=0.99,
+            epsilon=1.0 if training else 0.1,
+            epsilon_decrease=0.001 if training else 0,
+            min_epsilon=0.1,
+            learning_rate=0.0001,
+            use_cuda=self.use_cuda
         )
 
         self.checkpoint_frequency = checkpoint_frequency
@@ -65,6 +64,8 @@ class Session:
 
     def run(self):
         scores: List[Reward] = []
+        memory: Memory = []
+        
         for epoch in range(self.nb_epochs):
             gc.collect()
             if self.use_cuda:
@@ -81,16 +82,14 @@ class Session:
                 next_state, reward, done = self.environment.step(action)
 
                 rewards.append(reward)
-                if len(self.memory) >= self.memory_size:
-                    self.memory.pop(0)
-                self.memory.append((current_state, action, reward, next_state))
-
-                self.agent.backward(
-                    random.choices(
-                        self.memory,
-                        k=min(self.batch_size, len(self.memory))
+                if self.training:
+                    self.__update_agent(
+                        memory,
+                        current_state,
+                        action,
+                        reward,
+                        next_state
                     )
-                )
                 if done:
                     break
                 current_state = next_state
@@ -113,6 +112,25 @@ class Session:
                     model_path
                 )
                 print("Saved model to: " + model_path)
+
+    def __update_agent(
+        self, 
+        memory: Memory,
+        current_state: State,
+        action: Action,
+        reward: Reward,
+        next_state: State
+    ):
+        if len(memory) >= self.memory_size:
+            memory.pop(0)
+        memory.append((current_state, action, reward, next_state))
+        
+        self.agent.backward(
+            random.choices(
+                memory,
+                k=min(self.batch_size, len(memory))
+            )
+        )
 
     def close(self):
         self.environment.close()
